@@ -32,10 +32,39 @@ function getEmployees() {
         function (err, results) {
             console.table(results);
         });
+        // add if else statement for no manager
 };
+
+function addDepartment() {
+    inquirer.prompt([ 
+        {
+            name: 'newDepartment',
+            message: 'Enter the name of the new department.',
+        },
+    ])
+    .then((answer) => {
+        db.query('INSERT INTO department SET ?',
+        {
+            department_name: answer.newDepartment
+        },
+        console.log(`${answer.newDepartment} added.`))
+    })
+};
+
+function addRole() {
+    inquirer.prompt(
+        {
+
+        },
+    )
+    .then()
+}
+
+
 
 module.exports = {
     getDepartments,
     getRoles,
-    getEmployees
+    getEmployees,
+    addDepartment
 };

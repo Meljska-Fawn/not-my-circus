@@ -17,7 +17,7 @@ function getDepartments() {
         function (err, results) {
             console.table(results);
         });
-        questionPrompt();
+        // questionPrompt();
 };
 
 function getRoles() {
@@ -52,19 +52,37 @@ function addDepartment() {
 };
 
 function addRole() {
-    inquirer.prompt(
+    getDepartments();
+
+    inquirer.prompt([
         {
-
+            name: 'department',
+            message: 'Enter a department id.',
         },
-    )
-    .then()
-}
-
-
+        {
+            name: 'title',
+            message: 'What is the title of the role?',
+        },
+        {
+            name: 'salary',
+            message: 'What is the salary for the role?',
+        },
+    ])
+    .then((answer) => {
+        db.query('INSERT INTO roles SET ?',
+        {
+            title: answer.title,
+            salary: answer.salary,
+            department_id: answer.department
+        },
+        console.log(`${answer.title} added.`))
+    })
+};
 
 module.exports = {
     getDepartments,
     getRoles,
     getEmployees,
-    addDepartment
+    addDepartment,
+    addRole
 };

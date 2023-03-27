@@ -13,8 +13,8 @@ async function questionPrompt() {
                 'View all roles.',
                 'View all employees.',
                 'I want to add a department.',
-                'I want to add a role.'
-
+                'I want to add a role.',
+                'I want to add an employee.'
             ]
         })
         .then((answer) => {
@@ -34,13 +34,17 @@ async function questionPrompt() {
                     break;
                 case 'I want to add a role.':
                     db.addRole();
+                    break;
+                case 'I want to add an employee.':
+                    db.addEmployee();
+                    break;
             }
         })
 }
 
 questionPrompt();
 
-module.exports = questionPrompt
+module.exports = questionPrompt;
 
 
 

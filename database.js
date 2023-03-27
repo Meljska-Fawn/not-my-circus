@@ -79,10 +79,43 @@ function addRole() {
     })
 };
 
+function addEmployee() {
+
+    inquirer.prompt([
+        {
+            name: 'firstName',
+            message: 'Enter the employees first name.',
+        },
+        {
+            name: 'lastName',
+            message: 'Enter the employees last name.',
+        },
+        {
+            name: 'roleId',
+            message: 'What is the role id for the employee?',
+        },
+        {
+            name: 'managerId',
+            message: 'What is the manager id for the employees manager (leave blank if there is no manager)?',
+        },
+    ])
+    .then((answer) => {
+        db.query('INSERT INTO employees SET ?',
+        {
+            first_name: answer.firstName,
+            last_name: answer.lastName,
+            role_id: answer.roleId,
+            manager_id: answer.managerId
+        },
+        console.log(`${answer.firstName} ${answer.lastName} added.`))
+    })
+}
+
 module.exports = {
     getDepartments,
     getRoles,
     getEmployees,
     addDepartment,
-    addRole
+    addRole,
+    addEmployee
 };

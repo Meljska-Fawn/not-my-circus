@@ -2,7 +2,7 @@ const mysql = require('mysql2');
 const inquirer = require('inquirer');
 require('dotenv').config();
 require('console.table');
-const { questionPrompt } = require('./index');
+const index = require('./index');
 
 const db = mysql.createConnection(
     {
@@ -16,19 +16,19 @@ function getDepartments() {
     db.query('SELECT * FROM department',
         function (err, results) {
             console.table(results);
-            questionPrompt();
         });
+        questionPrompt();
 };
 
 function getRoles() {
-    db.query('SELECT * FROM roles',
+    db.query('SELECT roles.id, roles.title, department.department_name AS department, FORMAT(roles.salary, 0) AS salary FROM roles JOIN department ON roles.department_id = department.id ORDER BY roles.id;',
         function (err, results) {
             console.table(results);
         });
 };
 
 function getEmployees() {
-    db.query('SELECT * FROM employees',
+    db.query('SELECT employees.id, employees.first_name, employees.last_name, roles.title, department.department_name AS department, FORMAT(roles.salary, 0) AS salary, CONCAT_WS(" ", employees.first_name, employees.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employees m ON employees.manager_id = m.id ORDER BY employees.id',
         function (err, results) {
             console.table(results);
         });

@@ -11,7 +11,9 @@ async function questionPrompt() {
             choices: [
                 "View all departments.",
                 "View all roles.",
-                "View all employees."
+                "View all employees.",
+                "I want to add a department."
+
             ]
         })
         .then((answer) => {
@@ -27,12 +29,12 @@ async function questionPrompt() {
                     getEmployees();
                     break;
             }
-        });
-};
+        })
+}
 
 questionPrompt();
 
-module.exports = questionPrompt;
+module.exports = questionPrompt
 
 
 

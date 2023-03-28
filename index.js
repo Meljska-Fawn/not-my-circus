@@ -1,9 +1,6 @@
 const inquirer = require('inquirer');
-const db = require('./db/database');
-const { getDepartments, 
-    getRoles, 
-    getEmployees, 
-    addDepartment, addRole, addEmployee } = require('./db/database');
+const { getDepartments, getRoles, getEmployees, 
+    addDepartment, addRole, addEmployee, updateEmployee } = require('./db/database');
 require('console.table');
 
 function questionPrompt() {
@@ -44,7 +41,7 @@ function questionPrompt() {
                     newEmployee();
                     break;
                 case 'I want to update an employee role.':
-                    db.updateEmployee();
+                    updateEmployeeRole();
                     break;
             }
         })
@@ -85,7 +82,7 @@ function newDepartment() {
 function newRole() {
     inquirer.prompt([
         {
-            name: 'department',
+            name: 'department_id',
             message: 'Enter a department id.',
         },
         {
@@ -97,10 +94,10 @@ function newRole() {
             message: 'What is the salary for the role?',
         },
     ])
-        .then((answer) => {
-        console.log(answer)
-        addRole(answer)
-        console.log(`${answer.title} added.`)
+        .then(res => {
+        const { department_id, title, salary } = res;
+        addRole(department_id, title, salary)
+        .then(() => console.log(`${title} added.`))
         .then(() => questionPrompt());
         })
 };
@@ -124,9 +121,29 @@ function newEmployee() {
             message: 'What is the manager id for the employees manager (leave blank if there is no manager)?',
         },
     ])
-        .then((answer) => {
-        addEmployee(answer)
-        .then(() => console.log(`${answer.firstName} ${answer.lastName} added.`))
+        .then(res => {
+        const { firstName, lastName, roleId, managerId } = res;
+        addEmployee(firstName, lastName, roleId, managerId)
+        .then(() => console.log(`${firstName} ${lastName} added.`))
+        .then(() => questionPrompt());
+        })
+};
+
+function updateEmployeeRole() {
+    inquirer.prompt([
+        {
+            name: 'employeeId',
+            message: 'Enter the employees id.',
+        },
+        {
+            name: 'roleId',
+            message: 'What is the new role id for the employee?',
+        },
+    ])
+        .then(res => {
+        const { employeeId, roleId } = res;
+        updateEmployee(employeeId, roleId)
+        .then(() => console.log(`Updated employee's role.`))
         .then(() => questionPrompt());
         })
 };

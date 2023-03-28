@@ -70,7 +70,7 @@ async function viewRoles() {
 };
 
 async function viewEmployees() {
-    const employees = await getEmployees();
+    const employees = await getEmployees(); 
     console.table(employees[0]);
     await questionPrompt();
 };

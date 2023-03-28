@@ -21,12 +21,8 @@ function getEmployees() {
     return db.promise().query('SELECT employees.id, employees.first_name, employees.last_name, roles.title, department.department_name AS department, FORMAT(roles.salary, 0) AS salary, CONCAT_WS(" ", employees.first_name, employees.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id JOIN employees m ON employees.manager_id = m.id ORDER BY employees.id;')
 };
 
-function addDepartment(answer) {
-    return db.promise().query('INSERT INTO department SET ?',
-        {
-            department_name: answer.newDepartment
-        }
-    )
+function addDepartment(newDepartment) {
+    return db.promise().query('INSERT INTO department (department_name) VALUES (?)', [newDepartment])
 };
 
 function addRole(department_id, title, salary) {

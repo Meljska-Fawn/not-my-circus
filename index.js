@@ -76,14 +76,15 @@ async function viewEmployees() {
 };
 
 async function newDepartment() {
-    const answer = await inquirer.prompt([
+    const res = await inquirer.prompt([
         {
             name: 'newDepartment',
             message: 'Enter the name of the new department.',
         },
     ]);
-        await addDepartment(answer);
-        console.log(`${answer.newDepartment} added to the database.`);
+        const { newDepartment } = res;
+        await addDepartment(newDepartment);
+        console.log(`${newDepartment} added to the database.`);
         await questionPrompt();
 };
 

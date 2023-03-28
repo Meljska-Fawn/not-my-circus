@@ -1,6 +1,5 @@
 const inquirer = require('inquirer');
-const { getDepartments, getRoles, getEmployees, 
-    addDepartment, addRole, addEmployee, updateEmployee } = require('./db/database');
+const { getDepartments, getRoles, getEmployees, addDepartment, addRole, addEmployee, updateEmployee } = require('./db/database');
 require('console.table');
 
 function questionPrompt() {
@@ -49,61 +48,65 @@ function questionPrompt() {
 
 async function viewDepartments() {
     const depts = await getDepartments();
-            console.table(depts[0]);
-            questionPrompt();
+    console.table(depts[0]);
+    questionPrompt();
 };
 
 async function viewRoles() {
     const roles = await getRoles();
-            console.table(roles[0]);
-            questionPrompt();
+    console.table(roles[0]);
+    questionPrompt();
 };
 
 async function viewEmployees() {
     const employees = await getEmployees();
-            console.table(employees[0]);
-            questionPrompt();
+    console.table(employees[0]);
+    questionPrompt();
 };
 
-function newDepartment() {
-    inquirer.prompt([
+async function newDepartment() {
+    const answer = await inquirer.prompt([
         {
             name: 'newDepartment',
             message: 'Enter the name of the new department.',
         },
-    ])
-        .then((answer) => {
-        addDepartment(answer)
-        .then(() => console.log(`${answer.newDepartment} added to the database.`))
-        .then(() => questionPrompt());
-        })
+    ]);
+        await addDepartment(answer);
+        console.log(`${answer.newDepartment} added to the database.`);
+        questionPrompt();
 };
 
-function newRole() {
-    inquirer.prompt([
+async function newRole() {
+
+    const depts = await getDepartments();
+    console.table(depts[0]);
+        
+    const res = await inquirer.prompt([
         {
-            name: 'department_id',
-            message: 'Enter a department id.',
+            name: "department_id",
+            message: "Enter a department id (view table).",
         },
         {
-            name: 'title',
-            message: 'What is the title of the role?',
+            name: "title",
+            message: "What is the title of the role?",
         },
         {
-            name: 'salary',
-            message: 'What is the salary for the role?',
+            name: "salary",
+            message: "What is the salary for the role?",
         },
-    ])
-        .then(res => {
-        const { department_id, title, salary } = res;
-        addRole(department_id, title, salary)
-        .then(() => console.log(`${title} added.`))
-        .then(() => questionPrompt());
-        })
+    ]);
+    const { department_id, title, salary } = res;
+    await addRole(department_id, title, salary);
+    console.log(`${title} added.`);
+    await questionPrompt();
 };
 
-function newEmployee() {
-    inquirer.prompt([
+async function newEmployee() {
+
+    const roles = await getRoles();
+    console.table(roles[0]);
+
+    const res = await inquirer.prompt([
         {
             name: 'firstName',
             message: 'Enter the employees first name.',
@@ -114,23 +117,21 @@ function newEmployee() {
         },
         {
             name: 'roleId',
-            message: 'What is the role id for the employee?',
+            message: 'What is the role id for the employee (view table)?',
         },
         {
             name: 'managerId',
             message: 'What is the manager id for the employees manager (leave blank if there is no manager)?',
         },
-    ])
-        .then(res => {
+    ]);
         const { firstName, lastName, roleId, managerId } = res;
-        addEmployee(firstName, lastName, roleId, managerId)
-        .then(() => console.log(`${firstName} ${lastName} added.`))
-        .then(() => questionPrompt());
-        })
+        await addEmployee(firstName, lastName, roleId, managerId);
+        console.log(`${firstName} ${lastName} added.`);
+        questionPrompt();
 };
 
-function updateEmployeeRole() {
-    inquirer.prompt([
+async function updateEmployeeRole() {
+    const res = await inquirer.prompt([
         {
             name: 'employeeId',
             message: 'Enter the employees id.',
@@ -139,13 +140,11 @@ function updateEmployeeRole() {
             name: 'roleId',
             message: 'What is the new role id for the employee?',
         },
-    ])
-        .then(res => {
+    ]);
         const { employeeId, roleId } = res;
-        updateEmployee(employeeId, roleId)
-        .then(() => console.log(`Updated employee's role.`))
-        .then(() => questionPrompt());
-        })
+        await updateEmployee(employeeId, roleId);
+        console.log(`Updated employee's role.`);
+        questionPrompt();
 };
 
 questionPrompt();

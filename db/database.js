@@ -1,7 +1,5 @@
 const mysql = require('mysql2');
-const inquirer = require('inquirer');
 require('dotenv').config();
-require('console.table');
 
 const db = mysql.createConnection(
     {
@@ -20,36 +18,43 @@ function getRoles() {
 };
 
 function getEmployees() {
-    return db.promise().query('SELECT employees.id, employees.first_name, employees.last_name, roles.title, department.department_name AS department, FORMAT(roles.salary, 0) AS salary, CONCAT_WS(" ", employees.first_name, employees.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employees manager ON employees.manager_id = employees.id;')
+    return db.promise().query('SELECT employees.id, employees.first_name, employees.last_name, roles.title, department.department_name AS department, FORMAT(roles.salary, 0) AS salary, CONCAT_WS(" ", employees.first_name, employees.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id JOIN employees m ON employees.manager_id = m.id ORDER BY employees.id;')
 };
 
 function addDepartment(answer) {
-
-            return db.promise().query('INSERT INTO department SET ?', 
-            {
-                    department_name: answer.newDepartment
-                }
-            )
+    return db.promise().query('INSERT INTO department SET ?',
+        {
+            department_name: answer.newDepartment
+        }
+    )
 };
 
 function addRole(department_id, title, salary) {
-
-            return db.promise().query('INSERT INTO roles (department_id, title, salary) VALUES (?, ?, ?)', [department_id, title, salary]
-            )
+    return db.promise().query('INSERT INTO roles (department_id, title, salary) VALUES (?, ?, ?)', [department_id, title, salary])
 };
 
 function addEmployee(firstName, lastName, roleId, managerId) {
-
-        return db.promise().query('INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [firstName, lastName, roleId, managerId]
-            )
+    return db.promise().query('INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [firstName, lastName, roleId, managerId])
 };
 
 function updateEmployee(employeeId, roleId) {
-
-        return db.promise().query('UPDATE employees SET role_id = ? WHERE id = ?',
-                [roleId, employeeId]
-                )
+    return db.promise().query('UPDATE employees SET role_id = ? WHERE id = ?',
+        [roleId, employeeId])
 };
+
+function deleteDepartment(departmentId) {
+    return db.promise().query('DELETE FROM department WHERE id = ?', [departmentId])
+};
+
+function deleteRole(roleId) {
+    return db.promise().query('DELETE FROM roles WHERE id = ?', [roleId])
+};
+
+function deleteEmployee(employeeId) {
+    return db.promise().query('DELETE FROM employees WHERE id = ?', [employeeId])
+};
+
+
 
 module.exports = {
     getDepartments,
@@ -58,5 +63,8 @@ module.exports = {
     addDepartment,
     addRole,
     addEmployee,
-    updateEmployee
+    updateEmployee,
+    deleteDepartment,
+    deleteRole,
+    deleteEmployee
 };

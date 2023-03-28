@@ -1,9 +1,9 @@
 const inquirer = require('inquirer');
-const { getDepartments, getRoles, getEmployees, addDepartment, addRole, addEmployee, updateEmployee } = require('./db/database');
+const { getDepartments, getRoles, getEmployees, addDepartment, addRole, addEmployee, updateEmployee, deleteDepartment, deleteRole, deleteEmployee } = require('./db/database');
 require('console.table');
 
-function questionPrompt() {
-    inquirer.prompt(
+async function questionPrompt() {
+    const question = await inquirer.prompt([
         {
             name: 'choosen',
             type: 'list',
@@ -15,12 +15,15 @@ function questionPrompt() {
                 'I want to add a department.',
                 'I want to add a role.',
                 'I want to add an employee.',
-                'I want to update an employee role.'
+                'I want to update an employee role.',
+                'I want to delete a department.',
+                'I want to delete a role.',
+                'I want to delete an employee.'
             ]
-        })
-        .then((answer) => {
+        }
+    ])
 
-            switch (answer.choosen) {
+            switch (question.choosen) {
                 case 'View all departments.':
                     viewDepartments();
                     break;
@@ -42,26 +45,34 @@ function questionPrompt() {
                 case 'I want to update an employee role.':
                     updateEmployeeRole();
                     break;
+                case 'I want to delete a department.':
+                    removeDepartment();
+                    break;
+                case 'I want to delete a role.':
+                    removeRole();
+                    break;
+                case 'I want to delete an employee.':
+                    removeEmployee();
+                    break;
             }
-        })
 }
 
 async function viewDepartments() {
     const depts = await getDepartments();
     console.table(depts[0]);
-    questionPrompt();
+    await questionPrompt();
 };
 
 async function viewRoles() {
     const roles = await getRoles();
     console.table(roles[0]);
-    questionPrompt();
+    await questionPrompt();
 };
 
 async function viewEmployees() {
     const employees = await getEmployees();
     console.table(employees[0]);
-    questionPrompt();
+    await questionPrompt();
 };
 
 async function newDepartment() {
@@ -73,7 +84,7 @@ async function newDepartment() {
     ]);
         await addDepartment(answer);
         console.log(`${answer.newDepartment} added to the database.`);
-        questionPrompt();
+        await questionPrompt();
 };
 
 async function newRole() {
@@ -127,7 +138,7 @@ async function newEmployee() {
         const { firstName, lastName, roleId, managerId } = res;
         await addEmployee(firstName, lastName, roleId, managerId);
         console.log(`${firstName} ${lastName} added.`);
-        questionPrompt();
+        await questionPrompt();
 };
 
 async function updateEmployeeRole() {
@@ -144,7 +155,57 @@ async function updateEmployeeRole() {
         const { employeeId, roleId } = res;
         await updateEmployee(employeeId, roleId);
         console.log(`Updated employee's role.`);
-        questionPrompt();
+        await questionPrompt();
+};
+
+async function removeDepartment() {
+
+    const depts = await getDepartments();
+    console.table(depts[0]);
+
+    const res = await inquirer.prompt([
+        {
+            name: 'departmentId',
+            message: 'Enter the departments id you want to delete (view table).',
+        },
+    ]);
+        const { departmentId } = res;
+        await deleteDepartment(departmentId);
+        console.log(`Deleted department successfully.`);
+        await questionPrompt();
+};
+
+async function removeRole() {
+
+    const roles = await getRoles();
+    console.table(roles[0]);
+
+    const res = await inquirer.prompt([
+        {
+            name: 'roleId',
+            message: 'Enter the roles id you want to delete (view table).',
+        },
+    ]);
+        const { roleId } = res;
+        await deleteRole(roleId);
+        console.log(`Deleted role successfully.`);
+        await questionPrompt();
+};
+async function removeEmployee() {
+
+    const employees = await getEmployees();
+    console.table(employees[0]);
+
+    const res = await inquirer.prompt([
+        {
+            name: 'employeeId',
+            message: 'Enter the employees id you want to delete (view table).',
+        },
+    ]);
+        const { employeeId } = res;
+        await deleteEmployee(employeeId);
+        console.log(`Deleted employee successfully.`);
+        await questionPrompt();
 };
 
 questionPrompt();

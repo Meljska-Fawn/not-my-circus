@@ -2,7 +2,7 @@ const mysql = require('mysql2');
 const inquirer = require('inquirer');
 require('dotenv').config();
 require('console.table');
-const index = require('./index');
+
 
 const db = mysql.createConnection(
     {
@@ -13,11 +13,7 @@ const db = mysql.createConnection(
     });
 
 function getDepartments() {
-    db.query('SELECT * FROM department',
-        function (err, results) {
-            console.table(results);
-        });
-        // questionPrompt();
+    return db.promise().query('SELECT * FROM department')
 };
 
 function getRoles() {
@@ -32,23 +28,24 @@ function getEmployees() {
         function (err, results) {
             console.table(results);
         });
-        // add if else statement for no manager
+    // add if else statement for no manager
 };
 
 function addDepartment() {
-    inquirer.prompt([ 
+    inquirer.prompt([
         {
             name: 'newDepartment',
             message: 'Enter the name of the new department.',
         },
     ])
-    .then((answer) => {
-        db.query('INSERT INTO department SET ?',
-        {
-            department_name: answer.newDepartment
-        },
-        console.log(`${answer.newDepartment} added.`))
-    })
+        .then((answer) => {
+            console.log(`${answer} is added`);
+            return db.promise().query('INSERT INTO department SET ?', answer)
+                // {
+                //     department_name: answer.newDepartment
+                // },
+                // console.log(`${answer.newDepartment} added.`))
+        })
 };
 
 function addRole() {
@@ -68,15 +65,15 @@ function addRole() {
             message: 'What is the salary for the role?',
         },
     ])
-    .then((answer) => {
-        db.query('INSERT INTO roles SET ?',
-        {
-            title: answer.title,
-            salary: answer.salary,
-            department_id: answer.department
-        },
-        console.log(`${answer.title} added.`))
-    })
+        .then((answer) => {
+            db.query('INSERT INTO roles SET ?',
+                {
+                    title: answer.title,
+                    salary: answer.salary,
+                    department_id: answer.department
+                },
+                console.log(`${answer.title} added.`))
+        })
 };
 
 function addEmployee() {
@@ -99,17 +96,35 @@ function addEmployee() {
             message: 'What is the manager id for the employees manager (leave blank if there is no manager)?',
         },
     ])
-    .then((answer) => {
-        db.query('INSERT INTO employees SET ?',
-        {
-            first_name: answer.firstName,
-            last_name: answer.lastName,
-            role_id: answer.roleId,
-            manager_id: answer.managerId
-        },
-        console.log(`${answer.firstName} ${answer.lastName} added.`))
-    })
+        .then((answer) => {
+            db.query('INSERT INTO employees SET ?',
+                {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_id: answer.roleId,
+                    manager_id: answer.managerId
+                },
+                console.log(`${answer.firstName} ${answer.lastName} added.`))
+        })
 }
+function updateEmployee() {
+
+    inquirer.prompt([
+        {
+            name: 'employeeId',
+            message: 'Enter the employees id.',
+        },
+        {
+            name: 'roleId',
+            message: 'What is the new role id for the employee?',
+        },
+    ])
+        .then((answer) => {
+            db.query('UPDATE employees SET role_id = ? WHERE id = ?',
+                [answer.role_id, answer.id],
+                console.log(`Updated employee's role.`))
+        })
+};
 
 module.exports = {
     getDepartments,
@@ -117,5 +132,6 @@ module.exports = {
     getEmployees,
     addDepartment,
     addRole,
-    addEmployee
+    addEmployee,
+    updateEmployee
 };

@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
-const db = require('./database');
-const { getDepartments, getRoles, getEmployees } = require('./database');
+const db = require('./db/database');
+const { getDepartments, getRoles, getEmployees, addDepartment } = require('./db/database');
+require('console.table');
 
 async function questionPrompt() {
     inquirer.prompt(
@@ -14,14 +15,15 @@ async function questionPrompt() {
                 'View all employees.',
                 'I want to add a department.',
                 'I want to add a role.',
-                'I want to add an employee.'
+                'I want to add an employee.',
+                'I want to update an employee role.'
             ]
         })
         .then((answer) => {
 
             switch (answer.choosen) {
                 case 'View all departments.':
-                    getDepartments();
+                    viewDepartments();
                     break;
                 case 'View all roles.':
                     getRoles();
@@ -30,7 +32,7 @@ async function questionPrompt() {
                     getEmployees();
                     break;
                 case 'I want to add a department.':
-                    db.addDepartment();
+                    newDepartment();
                     break;
                 case 'I want to add a role.':
                     db.addRole();
@@ -38,13 +40,33 @@ async function questionPrompt() {
                 case 'I want to add an employee.':
                     db.addEmployee();
                     break;
+                case 'I want to update an employee role.':
+                    db.updateEmployee();
+                    break;
             }
         })
 }
 
+function viewDepartments() {
+    getDepartments()
+        .then((results) => {
+            console.table(results[0])
+        })
+        .then(() => questionPrompt());
+};
+
+function newDepartment() {
+    addDepartment()
+        // .then((results) => {
+            
+        //     console.table(results[0])
+        // })
+        .then(() => questionPrompt());
+};
+
 questionPrompt();
 
-module.exports = questionPrompt;
+module.exports = { questionPrompt };
 
 
 

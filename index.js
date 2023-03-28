@@ -1,9 +1,12 @@
 const inquirer = require('inquirer');
 const db = require('./db/database');
-const { getDepartments, getRoles, getEmployees, addDepartment } = require('./db/database');
+const { getDepartments, 
+    getRoles, 
+    getEmployees, 
+    addDepartment, addRole, addEmployee } = require('./db/database');
 require('console.table');
 
-async function questionPrompt() {
+function questionPrompt() {
     inquirer.prompt(
         {
             name: 'choosen',
@@ -26,19 +29,19 @@ async function questionPrompt() {
                     viewDepartments();
                     break;
                 case 'View all roles.':
-                    getRoles();
+                    viewRoles();
                     break;
                 case 'View all employees.':
-                    getEmployees();
+                    viewEmployees();
                     break;
                 case 'I want to add a department.':
                     newDepartment();
                     break;
                 case 'I want to add a role.':
-                    db.addRole();
+                    newRole();
                     break;
                 case 'I want to add an employee.':
-                    db.addEmployee();
+                    newEmployee();
                     break;
                 case 'I want to update an employee role.':
                     db.updateEmployee();
@@ -47,28 +50,85 @@ async function questionPrompt() {
         })
 }
 
-function viewDepartments() {
-    getDepartments()
-        .then((results) => {
-            console.table(results[0])
-        })
-        .then(() => questionPrompt());
+async function viewDepartments() {
+    const depts = await getDepartments();
+            console.table(depts[0]);
+            questionPrompt();
+};
+
+async function viewRoles() {
+    const roles = await getRoles();
+            console.table(roles[0]);
+            questionPrompt();
+};
+
+async function viewEmployees() {
+    const employees = await getEmployees();
+            console.table(employees[0]);
+            questionPrompt();
 };
 
 function newDepartment() {
-    addDepartment()
-        // .then((results) => {
-            
-        //     console.table(results[0])
-        // })
+    inquirer.prompt([
+        {
+            name: 'newDepartment',
+            message: 'Enter the name of the new department.',
+        },
+    ])
+        .then((answer) => {
+        addDepartment(answer)
+        .then(() => console.log(`${answer.newDepartment} added to the database.`))
         .then(() => questionPrompt());
+        })
+};
+
+function newRole() {
+    inquirer.prompt([
+        {
+            name: 'department',
+            message: 'Enter a department id.',
+        },
+        {
+            name: 'title',
+            message: 'What is the title of the role?',
+        },
+        {
+            name: 'salary',
+            message: 'What is the salary for the role?',
+        },
+    ])
+        .then((answer) => {
+        console.log(answer)
+        addRole(answer)
+        console.log(`${answer.title} added.`)
+        .then(() => questionPrompt());
+        })
+};
+
+function newEmployee() {
+    inquirer.prompt([
+        {
+            name: 'firstName',
+            message: 'Enter the employees first name.',
+        },
+        {
+            name: 'lastName',
+            message: 'Enter the employees last name.',
+        },
+        {
+            name: 'roleId',
+            message: 'What is the role id for the employee?',
+        },
+        {
+            name: 'managerId',
+            message: 'What is the manager id for the employees manager (leave blank if there is no manager)?',
+        },
+    ])
+        .then((answer) => {
+        addEmployee(answer)
+        .then(() => console.log(`${answer.firstName} ${answer.lastName} added.`))
+        .then(() => questionPrompt());
+        })
 };
 
 questionPrompt();
-
-module.exports = { questionPrompt };
-
-
-
-
-
